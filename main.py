@@ -2,6 +2,41 @@ import threading
 from socket import *
 from customtkinter import *
 
+class RegisterWindow(CTk):
+    def __init__(self):
+        super().__init__()
+        self.username = None
+        self.title("Приэднатися")
+        self.geometry("300x300")
+
+        CTkLabel(self, text = "Вход в LogiTalk", font = ("Arial", 20, "bold")).pack(pady = 40)
+        self.name_entry = CTkEntry(self, placeholder_text = "vvedi imya")
+        self.name_entry.pack()
+
+        self.host_entry = CTkEntry(self, placeholder_text= "dava host suda localhost")
+        self.host_entry.pack(pady = 5)
+        self.port_entry = CTkEntry(self, placeholder_text= "dava port sud 12334")
+        self.port_entry.pack()
+
+        self.submit_button = CTkButton(self, text = "Prisoedenylsa", command = self.start_chat)
+        self.submit_button.pack(pady = 5)
+
+    def start_chat(self):
+        self.username = self.name_entry.get().strip()
+        try:
+            self.sock = socket(AF_INET, SOCK_STREAM)
+            self.sock.connect((self.host_entry.get(), int(self.port_entry.get())))
+            hello = f"TEXT@{self.username}@[SYSTEM] {self.username} prisoedebylsa k chaty!\n"
+            self.sock.send(hello.encode("utf-8"))
+
+            self.destroy()
+
+            win = MainWindow(self.sock, self.username)
+            win.mainloop()
+        except Exception as e:
+            print(f"Nea")
+
+
 #Часть программы отвечающая за тему размер окна и всё остальное
 class MainWindow(CTk):
     def __init__(self):
@@ -140,4 +175,4 @@ class MainWindow(CTk):
 
 if __name__ == "__main__":
     win = MainWindow()
-    win.mainloop()
+    RegisterWindow().mainloop()
